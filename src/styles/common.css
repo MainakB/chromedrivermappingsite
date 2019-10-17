@@ -1,0 +1,25 @@
+button {
+  /* color: #fff; */
+  font-size: 15px;
+  font-family: inherit;
+  width: relative;
+  border: 2px solid #aaa;
+  border-radius: 4px;
+  margin: 8px;
+  outline: none;
+  padding: 4px;
+  box-sizing: border-box;
+  transition: all ease-in-out 300ms;
+}
+
+button[type="submit"]:hover {
+  border-color: dodgerblue;
+  /* background-color: gainsboro; */
+  box-shadow: 0 0 8px 0 dodgerblue;
+}
+
+button[type="submit"]:active {
+  background-color: dodgerblue;
+  color: white;
+  box-shadow: none;
+}

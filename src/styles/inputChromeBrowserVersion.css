@@ -1,0 +1,15 @@
+.input-text {
+  width: relative;
+  border: 2px solid #aaa;
+  border-radius: 2px;
+  margin: 8px 0;
+  outline: none;
+  padding: 4px;
+  box-sizing: border-box;
+  transition: all ease-in-out 300ms;
+}
+
+.input-text[type="text"]:hover {
+  border-color: dodgerblue;
+  box-shadow: 0 0 8px 0 dodgerblue;
+}
