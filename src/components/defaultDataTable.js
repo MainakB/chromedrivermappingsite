@@ -15,7 +15,7 @@ export default class DefaultDataTable extends React.Component {
 
   GetDefaultLayoutData() {
     this.FetchFromApi(
-      "http://omahaproxy.appspot.com/all.json",
+      "https://cors-anywhere.herokuapp.com/http://omahaproxy.appspot.com/all.json",
       "get",
       "json"
     ).then(results => {
