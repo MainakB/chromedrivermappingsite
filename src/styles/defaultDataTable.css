@@ -1,8 +1,35 @@
-table,
+table {
+  border-collapse: collapse;
+  border: 1px solid black;
+  /* font: normal 12px arial; */
+  width: 100%;
+}
+
 th,
 td {
-  border: 1px solid black;
+  padding: 6px;
+  border: 1px solid #ccc;
+  text-align: left;
 }
+
+/* tr:nth-of-type(even) > td,
+td[rowspan] {
+  background: #eee;
+} */
+
 thead {
-  color: green;
+  background: lightgray;
+  color: black;
+  font-weight: bold;
+}
+
+/* Media Queries */
+@media only screen and (max-width: 768px),
+  (min-device-width: 768px) and (max-device-width: 1024px) {
+  /* Section three*/
+  table {
+    overflow-x: scroll;
+    display: inline-block;
+    width: 90% !important;
+  }
 }
