@@ -19,18 +19,18 @@ export default class DefaultDataTable extends React.Component {
       "get",
       "json"
     ).then(results => {
-      this.GetChromedriverApiData();
+      //this.GetChromedriverApiData();
       return this.setState({ jsonResult: results });
     });
   }
 
-  GetChromedriverApiData() {
-    this.FetchFromApi(
-      "http://storage.googleapis.com/chromedriver/",
-      "get",
-      "xml"
-    ).then(results => console.log("Results", results));
-  }
+  // GetChromedriverApiData() {
+  //   this.FetchFromApi(
+  //     "http://storage.googleapis.com/chromedriver/",
+  //     "get",
+  //     "xml"
+  //   ).then(results => console.log("Results", results));
+  // }
 
   FetchFromApi(url, httpRequestType, payLoadType) {
     return fetch(url, { method: httpRequestType })
