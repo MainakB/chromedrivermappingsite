@@ -5,7 +5,8 @@ export default class DefaultDataTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      jsonResult: []
+      jsonResult: [],
+      chromedriversXmlResult: []
     };
   }
 
@@ -19,18 +20,21 @@ export default class DefaultDataTable extends React.Component {
       "get",
       "json"
     ).then(results => {
-      //this.GetChromedriverApiData();
+      this.GetChromedriverApiData();
       return this.setState({ jsonResult: results });
     });
   }
 
-  // GetChromedriverApiData() {
-  //   this.FetchFromApi(
-  //     "http://storage.googleapis.com/chromedriver/",
-  //     "get",
-  //     "xml"
-  //   ).then(results => console.log("Results", results));
-  // }
+  GetChromedriverApiData() {
+    this.FetchFromApi(
+      "https://cors-anywhere.herokuapp.com/http://storage.googleapis.com/chromedriver/",
+      "get",
+      "xml"
+    ).then(results => {
+      this.setState({ chromedriversXmlResult: results });
+      console.log("Results", results);
+    });
+  }
 
   FetchFromApi(url, httpRequestType, payLoadType) {
     return fetch(url, { method: httpRequestType })
@@ -42,12 +46,11 @@ export default class DefaultDataTable extends React.Component {
         }
       })
       .then(results => {
-        return results;
-        // if (payLoadType === "json") {
-        //   return results;
-        // } else {
-        //   return new DOMParser().parseFromString(results, "text/xml");
-        // }
+        if (payLoadType === "json") {
+          return results;
+        } else {
+          return new DOMParser().parseFromString(results, "text/xml");
+        }
       });
   }
 
@@ -78,10 +81,8 @@ export default class DefaultDataTable extends React.Component {
   }
 
   render() {
-    console.log(this.state.jsonResult);
-
     const persons = (
-      <div>
+      <div class="container">
         <table>
           <thead>
             <tr>

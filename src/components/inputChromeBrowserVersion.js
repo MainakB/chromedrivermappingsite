@@ -4,16 +4,16 @@ import "../styles/inputChromeBrowserVersion.css";
 
 const InputChromeBrowserVersion = props => {
   return (
-    <>
+    <div className="container">
       <input
         className="input-text"
         type="text"
-        placeholder="Enter chrome browser version"
+        placeholder="Enter chrome version"
         onChange={props.handleInputChange}
         value={props.inputDefaultValue}
       />
       <SubmitButton label="Submit" />
-    </>
+    </div>
   );
 };
 
