@@ -1,4 +1,5 @@
 import React from "react";
+import { xml2json } from "xml-js";
 import "../styles/defaultDataTable.css";
 
 export default class DefaultDataTable extends React.Component {
@@ -19,20 +20,34 @@ export default class DefaultDataTable extends React.Component {
       "https://cors-anywhere.herokuapp.com/http://omahaproxy.appspot.com/all.json",
       "get",
       "json"
-    ).then(results => {
-      this.GetChromedriverApiData();
-      return this.setState({ jsonResult: results });
-    });
+    )
+      .then(results => {
+        this.setState({ jsonResult: results });
+        return this.GetChromedriverApiData();
+      })
+      .then(jsonFromXml => {
+        let allKeys = jsonFromXml.reduce((acc, item) => {
+          acc.push(item.Key._text.substr(0, item.Key._text.indexOf("/")));
+          return acc;
+        }, []);
+        return allKeys;
+      })
+      .then(allKeysArray => {
+        let map = new Map();
+        console.log("Results", allKeysArray, map);
+      });
   }
 
   GetChromedriverApiData() {
-    this.FetchFromApi(
+    return this.FetchFromApi(
       "https://cors-anywhere.herokuapp.com/http://storage.googleapis.com/chromedriver/",
       "get",
       "xml"
     ).then(results => {
-      this.setState({ chromedriversXmlResult: results });
-      console.log("Results", results);
+      // return this.setState({
+      //   chromedriversXmlResult: JSON.parse(results).ListBucketResult.Contents
+      // });
+      return JSON.parse(results).ListBucketResult.Contents;
     });
   }
 
@@ -49,7 +64,8 @@ export default class DefaultDataTable extends React.Component {
         if (payLoadType === "json") {
           return results;
         } else {
-          return new DOMParser().parseFromString(results, "text/xml");
+          return xml2json(results, { compact: true, spaces: 4 });
+          // return new DOMParser().parseFromString(results, "text/xml");
         }
       });
   }
