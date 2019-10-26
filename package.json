@@ -7,10 +7,10 @@
     "npm": "6.9.0"
   },
   "dependencies": {
-    "@material-ui/core": "^4.5.1",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
-    "react-scripts": "3.2.0"
+    "react-scripts": "3.2.0",
+    "xml-js": "^1.6.11"
   },
   "scripts": {
     "start": "react-scripts start",

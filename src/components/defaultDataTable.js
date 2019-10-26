@@ -1,4 +1,5 @@
 import React from "react";
+import { xml2json } from "xml-js";
 import "../styles/defaultDataTable.css";
 
 export default class DefaultDataTable extends React.Component {
@@ -6,7 +7,7 @@ export default class DefaultDataTable extends React.Component {
     super(props);
     this.state = {
       jsonResult: [],
-      chromedriversXmlResult: []
+      chromedriversMapping: {}
     };
   }
 
@@ -19,20 +20,92 @@ export default class DefaultDataTable extends React.Component {
       "https://cors-anywhere.herokuapp.com/http://omahaproxy.appspot.com/all.json",
       "get",
       "json"
-    ).then(results => {
-      this.GetChromedriverApiData();
-      return this.setState({ jsonResult: results });
-    });
+    )
+      .then(results => {
+        this.setState({ jsonResult: results });
+        return this.GetChromedriverApiData();
+      })
+      .then(jsonFromXml => {
+        let allKeys = jsonFromXml.reduce((acc, item) => {
+          acc.add(item.Key._text.substr(0, item.Key._text.indexOf("/")));
+          return acc;
+        }, new Set());
+        return allKeys;
+      })
+      .then(allChromeDriversArray => {
+        let jsonResultArray = this.state.jsonResult;
+        let jsonResultArrayReduced = jsonResultArray.reduce(
+          (accumulator, item) => {
+            let jsonResultArrayItemReduced = item.versions.reduce(
+              (acc, versionObj) => {
+                let { current_version } = versionObj;
+                let temp = {};
+                const subStrChromeVer = versionObj.current_version.substr(
+                  0,
+                  versionObj.current_version.lastIndexOf(".")
+                );
+                temp[current_version] = this.GetChromeDriverValue(
+                  Array.from(allChromeDriversArray),
+                  subStrChromeVer
+                );
+                acc = { ...acc, ...temp };
+                return acc;
+              },
+              {}
+            );
+            accumulator = { ...accumulator, ...jsonResultArrayItemReduced };
+            return accumulator;
+          },
+          {}
+        );
+        return jsonResultArrayReduced;
+      })
+      .then(chromedriverChromebrowserArray => {
+        this.setState({ chromedriversMapping: chromedriverChromebrowserArray });
+      });
+  }
+
+  GetChromeDriverValue(allChromeDriversArray, subStrChromeVer) {
+    let chromeDriver;
+    let current_version = subStrChromeVer;
+    let count = 0;
+    do {
+      chromeDriver = this.GetChromeDriverMapping(
+        allChromeDriversArray,
+        current_version
+      );
+      if (!chromeDriver) {
+        current_version = current_version.substr(
+          0,
+          current_version.indexOf(".")
+        );
+        current_version = current_version - 1 + ".";
+      }
+      count++;
+    } while (!chromeDriver && count < 10);
+    return chromeDriver;
+  }
+
+  GetChromeDriverMapping(allChromeDriversArray, subStrChromeVer) {
+    let chromeDriver;
+
+    for (let i = 0; i < allChromeDriversArray.length; i++) {
+      const input = new RegExp(`^${subStrChromeVer}`);
+
+      if (input.test(allChromeDriversArray[i])) {
+        chromeDriver = allChromeDriversArray[i];
+      }
+    }
+    return chromeDriver;
   }
 
   GetChromedriverApiData() {
-    this.FetchFromApi(
+    return this.FetchFromApi(
       "https://cors-anywhere.herokuapp.com/http://storage.googleapis.com/chromedriver/",
       "get",
       "xml"
     ).then(results => {
-      this.setState({ chromedriversXmlResult: results });
-      console.log("Results", results);
+      return JSON.parse(results).ListBucketResult.Contents;
     });
   }
 
@@ -49,7 +122,8 @@ export default class DefaultDataTable extends React.Component {
         if (payLoadType === "json") {
           return results;
         } else {
-          return new DOMParser().parseFromString(results, "text/xml");
+          return xml2json(results, { compact: true, spaces: 4 });
+          // return new DOMParser().parseFromString(results, "text/xml");
         }
       });
   }
@@ -66,7 +140,7 @@ export default class DefaultDataTable extends React.Component {
           <td>{item.previous_version}</td>
           <td>{item.current_reldate}</td>
           <td>{item.previous_reldate}</td>
-          <td>-</td>
+          <td>{this.state.chromedriversMapping[item.current_version]}</td>
         </tr>
       );
     });
@@ -81,8 +155,8 @@ export default class DefaultDataTable extends React.Component {
   }
 
   render() {
-    const persons = (
-      <div class="container">
+    const dataTable = (
+      <div className="container">
         <table>
           <thead>
             <tr>
@@ -102,7 +176,7 @@ export default class DefaultDataTable extends React.Component {
 
     return (
       <div id="layout-content" className="layout-content-wrapper">
-        <div className="panel-list">{persons}</div>
+        <div className="panel-list">{dataTable}</div>
       </div>
     );
   }
