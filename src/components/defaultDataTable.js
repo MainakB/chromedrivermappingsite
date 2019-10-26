@@ -155,7 +155,7 @@ export default class DefaultDataTable extends React.Component {
   }
 
   render() {
-    const persons = (
+    const dataTable = (
       <div className="container">
         <table>
           <thead>
@@ -176,7 +176,7 @@ export default class DefaultDataTable extends React.Component {
 
     return (
       <div id="layout-content" className="layout-content-wrapper">
-        <div className="panel-list">{persons}</div>
+        <div className="panel-list">{dataTable}</div>
       </div>
     );
   }
