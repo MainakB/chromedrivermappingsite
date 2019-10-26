@@ -9,15 +9,19 @@ function App() {
     setInputDefaultText(event.target.value);
   };
 
+  const onChromeVersionSubmnit = () => {
+    console.log("Submitted");
+  };
+
   return (
     <div className="App">
-      <h1 className="app-header dark" style={{ "text-align": "center" }}>
+      <h1 className="app-header dark" style={{ textAlign: "center" }}>
         Chrome Browser - Chromedriver Mapping
       </h1>
-      <InputChromeBrowserVersion
+      {/* <InputChromeBrowserVersion
         handleInputChange={handleInputChange}
         inputDefaultValue={inputDefaultText}
-      />
+      /> */}
       <DefaultDataTable />
     </div>
   );

@@ -7,7 +7,7 @@ export default class DefaultDataTable extends React.Component {
     super(props);
     this.state = {
       jsonResult: [],
-      chromedriversXmlResult: []
+      chromedriversMapping: {}
     };
   }
 
@@ -27,15 +27,76 @@ export default class DefaultDataTable extends React.Component {
       })
       .then(jsonFromXml => {
         let allKeys = jsonFromXml.reduce((acc, item) => {
-          acc.push(item.Key._text.substr(0, item.Key._text.indexOf("/")));
+          acc.add(item.Key._text.substr(0, item.Key._text.indexOf("/")));
           return acc;
-        }, []);
+        }, new Set());
         return allKeys;
       })
-      .then(allKeysArray => {
-        let map = new Map();
-        console.log("Results", allKeysArray, map);
+      .then(allChromeDriversArray => {
+        let jsonResultArray = this.state.jsonResult;
+        let jsonResultArrayReduced = jsonResultArray.reduce(
+          (accumulator, item) => {
+            let jsonResultArrayItemReduced = item.versions.reduce(
+              (acc, versionObj) => {
+                let { current_version } = versionObj;
+                let temp = {};
+                const subStrChromeVer = versionObj.current_version.substr(
+                  0,
+                  versionObj.current_version.lastIndexOf(".")
+                );
+                temp[current_version] = this.GetChromeDriverValue(
+                  Array.from(allChromeDriversArray),
+                  subStrChromeVer
+                );
+                acc = { ...acc, ...temp };
+                return acc;
+              },
+              {}
+            );
+            accumulator = { ...accumulator, ...jsonResultArrayItemReduced };
+            return accumulator;
+          },
+          {}
+        );
+        return jsonResultArrayReduced;
+      })
+      .then(chromedriverChromebrowserArray => {
+        this.setState({ chromedriversMapping: chromedriverChromebrowserArray });
       });
+  }
+
+  GetChromeDriverValue(allChromeDriversArray, subStrChromeVer) {
+    let chromeDriver;
+    let current_version = subStrChromeVer;
+    let count = 0;
+    do {
+      chromeDriver = this.GetChromeDriverMapping(
+        allChromeDriversArray,
+        current_version
+      );
+      if (!chromeDriver) {
+        current_version = current_version.substr(
+          0,
+          current_version.indexOf(".")
+        );
+        current_version = current_version - 1 + ".";
+      }
+      count++;
+    } while (!chromeDriver && count < 10);
+    return chromeDriver;
+  }
+
+  GetChromeDriverMapping(allChromeDriversArray, subStrChromeVer) {
+    let chromeDriver;
+
+    for (let i = 0; i < allChromeDriversArray.length; i++) {
+      const input = new RegExp(`^${subStrChromeVer}`);
+
+      if (input.test(allChromeDriversArray[i])) {
+        chromeDriver = allChromeDriversArray[i];
+      }
+    }
+    return chromeDriver;
   }
 
   GetChromedriverApiData() {
@@ -44,9 +105,6 @@ export default class DefaultDataTable extends React.Component {
       "get",
       "xml"
     ).then(results => {
-      // return this.setState({
-      //   chromedriversXmlResult: JSON.parse(results).ListBucketResult.Contents
-      // });
       return JSON.parse(results).ListBucketResult.Contents;
     });
   }
@@ -82,7 +140,7 @@ export default class DefaultDataTable extends React.Component {
           <td>{item.previous_version}</td>
           <td>{item.current_reldate}</td>
           <td>{item.previous_reldate}</td>
-          <td>-</td>
+          <td>{this.state.chromedriversMapping[item.current_version]}</td>
         </tr>
       );
     });
@@ -98,7 +156,7 @@ export default class DefaultDataTable extends React.Component {
 
   render() {
     const persons = (
-      <div class="container">
+      <div className="container">
         <table>
           <thead>
             <tr>
