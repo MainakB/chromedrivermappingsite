@@ -1,5 +1,9 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Hosted URL link
+
+https://www.uitests-chromedrivermapping.com
+
 ## Available Scripts
 
 In the project directory, you can run:
