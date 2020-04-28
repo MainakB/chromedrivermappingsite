@@ -7,7 +7,7 @@ export default class DefaultDataTable extends React.Component {
     super(props);
     this.state = {
       jsonResult: [],
-      chromedriversMapping: {}
+      chromedriversMapping: {},
     };
   }
 
@@ -17,22 +17,23 @@ export default class DefaultDataTable extends React.Component {
 
   GetDefaultLayoutData() {
     this.FetchFromApi(
-      "https://cors-anywhere.herokuapp.com/http://omahaproxy.appspot.com/all.json",
+      // "https://cors-anywhere.herokuapp.com/http://omahaproxy.appspot.com/all.json",
+      "http://localhost:9000/getChromeChannels",
       "get",
       "json"
     )
-      .then(results => {
-        this.setState({ jsonResult: results });
+      .then((results) => {
+        this.setState({ jsonResult: JSON.parse(results) });
         return this.GetChromedriverApiData();
       })
-      .then(jsonFromXml => {
+      .then((jsonFromXml) => {
         let allKeys = jsonFromXml.reduce((acc, item) => {
           acc.add(item.Key._text.substr(0, item.Key._text.indexOf("/")));
           return acc;
         }, new Set());
         return allKeys;
       })
-      .then(allChromeDriversArray => {
+      .then((allChromeDriversArray) => {
         let jsonResultArray = this.state.jsonResult;
         let jsonResultArrayReduced = jsonResultArray.reduce(
           (accumulator, item) => {
@@ -60,7 +61,7 @@ export default class DefaultDataTable extends React.Component {
         );
         return jsonResultArrayReduced;
       })
-      .then(chromedriverChromebrowserArray => {
+      .then((chromedriverChromebrowserArray) => {
         this.setState({ chromedriversMapping: chromedriverChromebrowserArray });
       });
   }
@@ -101,28 +102,25 @@ export default class DefaultDataTable extends React.Component {
 
   GetChromedriverApiData() {
     return this.FetchFromApi(
-      "https://cors-anywhere.herokuapp.com/http://storage.googleapis.com/chromedriver/",
+      // "https://cors-anywhere.herokuapp.com/http://storage.googleapis.com/chromedriver/",
+      "http://localhost:9000/getChromedrivers",
       "get",
       "xml"
-    ).then(results => {
+    ).then((results) => {
       return JSON.parse(results).ListBucketResult.Contents;
     });
   }
 
   FetchFromApi(url, httpRequestType, payLoadType) {
     return fetch(url, { method: httpRequestType })
-      .then(res => {
-        if (payLoadType === "json") {
-          return res.json();
-        } else {
-          return res.text();
-        }
+      .then((res) => {
+        return res.json();
       })
-      .then(results => {
+      .then((results) => {
         if (payLoadType === "json") {
-          return results;
+          return results.body;
         } else {
-          return xml2json(results, { compact: true, spaces: 4 });
+          return xml2json(results.body, { compact: true, spaces: 4 });
           // return new DOMParser().parseFromString(results, "text/xml");
         }
       });
@@ -131,7 +129,7 @@ export default class DefaultDataTable extends React.Component {
   BuildChannels(os, versions) {
     const expandedVersion = versions.map((item, index) => {
       return (
-        <tr>
+        <tr key={`${os}${index}`}>
           {(() => {
             if (index === 0) return <td rowSpan={versions.length}>{os}</td>;
           })()}
@@ -140,7 +138,11 @@ export default class DefaultDataTable extends React.Component {
           <td>{item.previous_version}</td>
           <td>{item.current_reldate}</td>
           <td>{item.previous_reldate}</td>
-          <td>{item.channel.includes('canary')? 'Chromedriver support not available. Use chrome executable directly.' : this.state.chromedriversMapping[item.current_version]}</td>
+          <td>
+            {item.channel.includes("canary")
+              ? "Chromedriver support not available. Use chrome executable directly."
+              : this.state.chromedriversMapping[item.current_version]}
+          </td>
         </tr>
       );
     });

@@ -1,17 +1,18 @@
 import React from "react";
-import InputChromeBrowserVersion from "./components/inputChromeBrowserVersion";
 import DefaultDataTable from "./components/defaultDataTable";
 
 function App() {
-  const [inputDefaultText, setInputDefaultText] = React.useState("");
+  //Use  when changes done FOR inputDefaultText
+  // const [inputDefaultText, setInputDefaultText] = React.useState(""); // Use inputDefaultText when changes done
+  // const [inputDefaultText, setInputDefaultText] = React.useState("");
 
-  const handleInputChange = event => {
-    setInputDefaultText(event.target.value);
-  };
+  // const handleInputChange = (event) => {
+  //   setInputDefaultText(event.target.value);
+  // };
 
-  const onChromeVersionSubmnit = () => {
-    console.log("Submitted");
-  };
+  // const onChromeVersionSubmnit = () => {
+  //   console.log("Submitted");
+  // };
 
   return (
     <div className="App">
