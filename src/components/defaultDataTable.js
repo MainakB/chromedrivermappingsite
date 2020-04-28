@@ -140,7 +140,7 @@ export default class DefaultDataTable extends React.Component {
           <td>{item.previous_version}</td>
           <td>{item.current_reldate}</td>
           <td>{item.previous_reldate}</td>
-          <td>{this.state.chromedriversMapping[item.current_version]}</td>
+          <td>{item.channel.includes('canary')? 'Chromedriver support not available. Use chrome executable directly.' : this.state.chromedriversMapping[item.current_version]}</td>
         </tr>
       );
     });
