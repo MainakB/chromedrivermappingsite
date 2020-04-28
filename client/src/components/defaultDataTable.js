@@ -1,4 +1,5 @@
 import React from "react";
+import Loader from "react-loader-spinner";
 import { xml2json } from "xml-js";
 import "../styles/defaultDataTable.css";
 
@@ -6,6 +7,7 @@ export default class DefaultDataTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      loading: true,
       jsonResult: [],
       chromedriversMapping: {},
     };
@@ -27,6 +29,7 @@ export default class DefaultDataTable extends React.Component {
         return this.GetChromedriverApiData();
       })
       .then((jsonFromXml) => {
+        this.setState({ loading: false });
         let allKeys = jsonFromXml.reduce((acc, item) => {
           acc.add(item.Key._text.substr(0, item.Key._text.indexOf("/")));
           return acc;
@@ -176,10 +179,28 @@ export default class DefaultDataTable extends React.Component {
       </div>
     );
 
-    return (
-      <div id="layout-content" className="layout-content-wrapper">
-        <div className="panel-list">{dataTable}</div>
-      </div>
-    );
+    if (this.state.loading) {
+      return (
+        <div
+          style={{
+            width: "100%",
+            height: "100",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          className="spinner-border text-primary"
+          role="status"
+        >
+          <Loader type="ThreeDots" color="#2BAD60" height="100" width="100" />
+        </div>
+      );
+    } else {
+      return (
+        <div id="layout-content" className="layout-content-wrapper">
+          <div className="panel-list">{dataTable}</div>
+        </div>
+      );
+    }
   }
 }
